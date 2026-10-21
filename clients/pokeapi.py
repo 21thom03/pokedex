@@ -3,6 +3,8 @@ from schemas.pokemon import Pokemon
 
 POKEAPI_URL = "https://pokeapi.co/api/v2"
 
+types = []
+
 def get_pokemon_from_api(number:int):
   api_answer = requests.get(f"{POKEAPI_URL}/pokemon/{number}")
   if api_answer.status_code != requests.codes.ok :
@@ -27,11 +29,25 @@ def get_pokemon_from_api(number:int):
       name_fr = name["name"]
       break
 
+  pokemon_types = []
+  for pokemon_technical_types in pokeapi_info["types"]:
+    api_answer = requests.get(f"{POKEAPI_URL}/type/{pokemon_technical_types["type"]["name"]}")
+    if api_answer.status_code != requests.codes.ok :
+      return None , {
+        "status_code" : api_answer.status_code,
+        "error" : "Pokemon type inaccessible"
+        }
+    pokeapi_types = api_answer.json()
+    for type_name in pokeapi_types["names"]:
+      if type_name["language"]["name"]== "fr" :
+        pokemon_types.append({"name" : type_name["name"], "id" : pokeapi_types["id"]})
+        types.append({"name_en" : pokemon_technical_types["type"]["name"], "name_fr" : type_name["name"]})
+
   pokemon_info = Pokemon(
     number = pokeapi_info["id"], 
     name = pokeapi_info["name"],
     name_fr = name_fr,
-    types = [pokemon_type["type"] for pokemon_type in pokeapi_info["types"]],
+    types = pokemon_types,
     image_url = pokeapi_info["sprites"]["front_default"],
     height = pokeapi_info["height"],
     weight = pokeapi_info["weight"],
