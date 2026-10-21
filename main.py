@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from schemas.pokemon import Pokemon
 from db.database import get_connection
+from clients.pokeapi import get_pokemon_from_api
 import requests, json
 
 POKEAPI_URL = "https://pokeapi.co/api/v2"
@@ -30,3 +31,12 @@ def get_pokemon(number:int):
     }
   return pokemon_info
 
+@app.get("/pokemons/{number}/scan")
+def get_pokemon_by_scan(number:int):
+  pokemon, error_message = get_pokemon_from_api(number)
+  if pokemon == None:
+    raise HTTPException(
+      status_code= error_message["status_code"],
+      detail= error_message["error"]
+    )
+  return pokemon
