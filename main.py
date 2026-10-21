@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 import requests, json
 
@@ -11,3 +11,21 @@ def get_health():
   return {
     "status" : "ok"
   }
+
+@app.get("/pokemons/{number}")
+def get_pokemon(number:int):
+  api_answer = requests.get(f"{POKEAPI_URL}/pokemon/{number}")
+  if api_answer.status_code != requests.codes.ok :
+    raise HTTPException(
+      status_code=api_answer.status_code,
+      detail="Pokemon number non-existent"
+    )
+  json_answer = api_answer.json()
+  pokemon_info = {
+    "number" : json_answer["id"],
+    "name" : json_answer["name"],
+    "height" : json_answer["height"],
+    "weight" : json_answer["weight"],
+    }
+  return pokemon_info
+
