@@ -21,13 +21,19 @@ def get_pokemon_from_api(number:int):
       "status_code" : api_answer.status_code,
       "error" : "Pokemon inaccesible"
       }
-  pokeapi_name_info = api_answer.json()
+  pokeapi_species_info = api_answer.json()
 
   name_fr = None
-  for name in pokeapi_name_info["names"]:
+  for name in pokeapi_species_info["names"]:
     if name["language"]["name"]== "fr" :
       name_fr = name["name"]
       break
+
+  previous_evolution = pokeapi_species_info["evolves_from_species"]
+  pokemon_previous_evolution = None
+  if previous_evolution != None :
+    pokemon_previous_evolution = int(previous_evolution["url"].split("/")[-2])
+    if pokemon_previous_evolution > 151 : pokemon_previous_evolution = None
 
   pokemon_types = []
   for pokemon_technical_types in pokeapi_info["types"]:
@@ -51,6 +57,6 @@ def get_pokemon_from_api(number:int):
     image_url = pokeapi_info["sprites"]["front_default"],
     height = pokeapi_info["height"],
     weight = pokeapi_info["weight"],
-    evolves_from_number= None
+    evolves_from_number = pokemon_previous_evolution
   )
   return pokemon_info, ""
