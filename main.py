@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from schemas.pokemon import Pokemon
 import requests, json
 
 POKEAPI_URL = "https://pokeapi.co/api/v2"
