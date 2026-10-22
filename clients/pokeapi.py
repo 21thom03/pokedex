@@ -5,7 +5,7 @@ POKEAPI_URL = "https://pokeapi.co/api/v2"
 
 types = []
 
-def get_pokemon_from_api(number:int):
+def get_pokemon_from_api(number:int) -> {Pokemon, str}:
   api_answer = requests.get(f"{POKEAPI_URL}/pokemon/{number}")
   if api_answer.status_code != requests.codes.ok :
     return None , {
@@ -33,7 +33,7 @@ def get_pokemon_from_api(number:int):
   pokemon_previous_evolution = None
   if previous_evolution != None :
     pokemon_previous_evolution = int(previous_evolution["url"].split("/")[-2])
-    if pokemon_previous_evolution > 151 : pokemon_previous_evolution = None
+    if pokemon_previous_evolution > 151 : pokemon_previous_evolution = 0
 
   pokemon_types = []
   for pokemon_technical_types in pokeapi_info["types"]:
@@ -48,6 +48,7 @@ def get_pokemon_from_api(number:int):
       if type_name["language"]["name"]== "fr" :
         pokemon_types.append({"name" : type_name["name"], "id" : pokeapi_types["id"]})
         types.append({"name_en" : pokemon_technical_types["type"]["name"], "name_fr" : type_name["name"]})
+        break
 
   pokemon_info = Pokemon(
     number = pokeapi_info["id"], 

@@ -35,8 +35,9 @@ def get_pokemon(number:int):
 
 @app.get("/pokemons/{number}/scan")
 def get_pokemon_by_scan(number:int):
-  pokemon, error_message = get_pokemon_from_api(number)
-  if pokemon == None:
+  pokemon, error_message = get_pokemon_service(number)
+  # pokemon, error_message = get_pokemon_from_api(number)
+  if pokemon == None :
     raise HTTPException(
       status_code= error_message["status_code"],
       detail= error_message["error"]
