@@ -6,7 +6,7 @@ certifi==2026.10.19
 charset-normalizer==3.5.2
 click==8.5.0
 detect-installer==0.2.1
-dnspython==2.9.0
+dnspython==2.9.2
 email-validator==2.3.0
 fastapi==0.156.4
 fastapi-cli==0.0.32
@@ -24,7 +24,7 @@ Jinja2==3.1.6
 markdown-it-py==4.2.0
 MarkupSafe==3.0.4
 mdurl==0.1.2
-opentelemetry-api==1.45.1
+opentelemetry-api==1.45.2
 opentelemetry-exporter-http-transport==0.66b1
 opentelemetry-exporter-otlp-common==0.66b1
 opentelemetry-exporter-otlp-proto-common==1.45.1
