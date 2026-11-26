@@ -126,6 +126,72 @@ def get_type_in_database(technical_type:str) -> dict:
     return None
   return type_json["name_fr"]
 
+def get_tallest_pokemon():
+  connection = get_connection()
+  cursor = connection.cursor()
+  try :
+    cursor.execute(
+      """
+        SELECT *, MAX(height) FROM pokemon
+      """
+    )
+    pokemon_json = cursor.fetchone()
+    connection.commit()
+  except Exception as e :
+    connection.rollback()
+    error_message = {
+      "status_code" : 400,
+      "error" : f"Error with database : {e}"
+    }
+    connection.close()
+    return None, error_message
+  connection.close()
+  return pokemon_json, None
+
+def get_heaviest_pokemon():
+  connection = get_connection()
+  cursor = connection.cursor()
+  try :
+    cursor.execute(
+      """
+        SELECT *, MAX(weight) FROM pokemon
+      """
+    )
+    pokemon_json = cursor.fetchone()
+    connection.commit()
+  except Exception as e :
+    connection.rollback()
+    error_message = {
+      "status_code" : 400,
+      "error" : f"Error with database : {e}"
+    }
+    connection.close()
+    return None, error_message
+  connection.close()
+  return pokemon_json, None
+
+def get_highest_pokemon():
+  connection = get_connection()
+  cursor = connection.cursor()
+  try :
+    cursor.execute(
+      """
+        SELECT *, MAX(number) FROM pokemon
+      """
+    )
+    pokemon_json = cursor.fetchone()
+    connection.commit()
+  except Exception as e :
+    connection.rollback()
+    error_message = {
+      "status_code" : 400,
+      "error" : f"Error with database : {e}"
+    }
+    connection.close()
+    return None, error_message
+  connection.close()
+  return pokemon_json, None
+
 def push_type_in_database(pokemon_type:Type) -> dict:
   error_message = None
   connection = get_connection()
@@ -155,4 +221,4 @@ def push_type_in_database(pokemon_type:Type) -> dict:
       "error" : f"Error with database : {e}"
     }
   connection.close()
-  return error_message 
+  return error_message

@@ -4,7 +4,7 @@ from schemas.pokemon import Pokemon
 from db.database import create_database
 from core.security import verify_token
 from services.pokemon_service import get_pokemon_service
-from repositories.pokemon_repository import get_pokemon_by_number, get_all_pokemons
+from repositories.pokemon_repository import get_pokemon_by_number, get_all_pokemons, get_tallest_pokemon, get_heaviest_pokemon, get_highest_pokemon
 import requests, json
 
 create_database()
@@ -71,7 +71,7 @@ def get_stats():
   }
 
 @app.get("/stats/types")
-def get_stats():
+def get_stats_types():
   all_pokemon, error_message = get_all_pokemons()
   if error_message != None :
     raise HTTPException(
@@ -87,3 +87,27 @@ def get_stats():
         types[pokemon_type] = 1
 
   return types
+
+@app.get("/stats/records")
+def get_stats_records():
+  tallest_pokemon, _ = get_tallest_pokemon()
+  if tallest_pokemon == None:
+    return { None }
+  heaviest_pokemon, _ = get_heaviest_pokemon()
+  highest_pokemon, _ = get_highest_pokemon()
+  return {
+    "tallest": {
+      "number": tallest_pokemon["number"],
+      "name_fr": tallest_pokemon["name"],
+      "height": tallest_pokemon["height"]
+      },
+    "heaviest": {
+      "number": heaviest_pokemon["number"],
+      "name_fr": heaviest_pokemon["name"],
+      "weight": heaviest_pokemon["weight"],
+      },
+    "highest_number": {
+      "number": highest_pokemon["number"],
+      "name_fr": highest_pokemon["name"],
+      }
+  }
