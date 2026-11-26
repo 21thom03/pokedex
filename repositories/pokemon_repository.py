@@ -36,7 +36,7 @@ def get_all_pokemons():
         weight= pokemon["weight"],
         evolves_from_number= pokemon["evolves_from_number"],
       ))
-  return all_pokemon, ""
+  return all_pokemon, None
 
 def get_pokemon_by_number(number) -> Pokemon:
   connection = get_connection()

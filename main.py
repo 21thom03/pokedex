@@ -55,3 +55,17 @@ def get_pokemon_by_scan(number:int):
       detail= error_message["error"]
     )
   return pokemon
+
+@app.get("/stats")
+def get_stats():
+  pokemon_discovered, error_message = get_all_pokemons()
+  if error_message != None :
+    raise HTTPException(
+    status_code= error_message["status_code"],
+    detail= error_message["error"]
+  )
+  return {
+    "discovered" : len(pokemon_discovered),
+    "remaining" : 151-len(pokemon_discovered),
+    "completion_percentage" : round(len(pokemon_discovered)/151 * 100, 2)
+  }
