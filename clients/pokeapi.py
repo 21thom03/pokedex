@@ -1,5 +1,6 @@
 import requests, json
 from schemas.pokemon import Pokemon
+from schemas.type import Type
 
 POKEAPI_URL = "https://pokeapi.co/api/v2"
 
@@ -34,30 +35,29 @@ def get_pokemon_from_api(number:int) -> {Pokemon, str}:
   if previous_evolution != None :
     pokemon_previous_evolution = int(previous_evolution["url"].split("/")[-2])
     if pokemon_previous_evolution > 151 : pokemon_previous_evolution = 0
-
-  pokemon_types = []
-  for pokemon_technical_types in pokeapi_info["types"]:
-    api_answer = requests.get(f"{POKEAPI_URL}/type/{pokemon_technical_types["type"]["name"]}")
-    if api_answer.status_code != requests.codes.ok :
-      return None , {
-        "status_code" : api_answer.status_code,
-        "error" : "Pokemon type inaccessible"
-        }
-    pokeapi_types = api_answer.json()
-    for type_name in pokeapi_types["names"]:
-      if type_name["language"]["name"]== "fr" :
-        pokemon_types.append({"name" : type_name["name"], "id" : pokeapi_types["id"]})
-        types.append({"name_en" : pokemon_technical_types["type"]["name"], "name_fr" : type_name["name"]})
-        break
-
   pokemon_info = Pokemon(
     number = pokeapi_info["id"], 
     name = pokeapi_info["name"],
     name_fr = name_fr,
-    types = pokemon_types,
+    types = [types["type"]["name"] for types in pokeapi_info["types"]],
     image_url = pokeapi_info["sprites"]["front_default"],
     height = pokeapi_info["height"],
     weight = pokeapi_info["weight"],
     evolves_from_number = pokemon_previous_evolution
   )
   return pokemon_info, ""
+
+def get_type_from_api(technical_type:str)->Type:
+  api_answer = requests.get(f"{POKEAPI_URL}/type/{technical_type}")
+  if api_answer.status_code != requests.codes.ok :
+    return None , {
+      "status_code" : api_answer.status_code,
+      "error" : "Pokemon type inaccessible"
+      }
+  pokeapi_types = api_answer.json()
+  for type_name in pokeapi_types["names"]:
+    if type_name["language"]["name"]== "fr" :
+      pokemon_type = Type(id = pokeapi_types["id"], name=technical_type, name_fr=type_name["name"])
+      break
+
+  return pokemon_type, ""

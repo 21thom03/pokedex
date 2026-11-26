@@ -4,8 +4,6 @@ from db.database import create_database
 from services.pokemon_service import get_pokemon_service
 import requests, json
 
-POKEAPI_URL = "https://pokeapi.co/api/v2"
-
 create_database()
 
 app = FastAPI()

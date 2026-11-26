@@ -1,5 +1,6 @@
 from db.database import get_connection
 from schemas.pokemon import Pokemon
+from schemas.type import Type
 import json
 
 def get_pokemon_by_number(number) -> Pokemon:
@@ -14,10 +15,11 @@ def get_pokemon_by_number(number) -> Pokemon:
     )
   )
   pokemon_json = cursor.fetchone()
+  connection.commit()
+  connection.close()
   if(pokemon_json is None):
-    pokemon = None
-  else :
-    pokemon = Pokemon(
+    return None
+  return Pokemon(
       number=pokemon_json["number"],
       name= pokemon_json["name"],
       name_fr= pokemon_json["name_fr"],
@@ -27,12 +29,10 @@ def get_pokemon_by_number(number) -> Pokemon:
       weight= pokemon_json["weight"],
       evolves_from_number= pokemon_json["evolves_from_number"],
     )
-  connection.commit()
-  connection.close()
-  return pokemon
 
-def push_pokemon_to_db(pokemon:Pokemon):
+def push_pokemon_to_db(pokemon:Pokemon) -> dict:
   error_message = None
+  print(pokemon.types)
   connection = get_connection()
   cursor = connection.cursor()
   try :
@@ -69,6 +69,55 @@ def push_pokemon_to_db(pokemon:Pokemon):
       "status_code" : 400,
       "error" : f"Error with database : {e}"
     }
+    print(f"\033[35mError: {error_message}\033[00m")
+  connection.close()
+  return error_message 
 
+def get_type_in_database(technical_type:str) -> dict:
+  connection = get_connection()
+  cursor = connection.cursor()
+  cursor.execute(
+    """
+      SELECT * FROM pokemon_types WHERE name == ?
+    """,
+    (
+      technical_type,
+    )
+  )
+  type_json = cursor.fetchone()
+  connection.commit()
+  connection.close()
+  if(type_json is None):
+    return None
+  return type_json["name_fr"]
+
+def push_type_in_database(pokemon_type:Type) -> dict:
+  error_message = None
+  connection = get_connection()
+  cursor = connection.cursor()
+  try :
+    cursor.execute(
+      """
+        INSERT INTO pokemon_types
+        (
+          id,
+          name,
+          name_fr
+        )
+        VALUES (? ,? ,?)
+      """,
+      (
+        pokemon_type.id,
+        pokemon_type.name,
+        pokemon_type.name_fr,
+      )
+    )
+    connection.commit()
+  except Exception as e :
+    connection.rollback()
+    error_message = {
+      "status_code" : 400,
+      "error" : f"Error with database : {e}"
+    }
   connection.close()
   return error_message 
