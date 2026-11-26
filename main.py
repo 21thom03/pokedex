@@ -1,12 +1,12 @@
-from fastapi import FastAPI, HTTPException, Header
+from fastapi import FastAPI, HTTPException, Depends
 from schemas.pokemon import Pokemon
 from db.database import create_database
+from core.security import verify_token
 from services.pokemon_service import get_pokemon_service
 from repositories.pokemon_repository import get_pokemon_by_number, get_all_pokemons
 import requests, json
 
 create_database()
-TOKEN = "ENSEA2026"
 
 app = FastAPI()
 
@@ -38,13 +38,8 @@ def get_pokemon(number:int):
   return pokemon
 
 
-@app.get("/pokemons/{number}/scan")
-def get_pokemon_by_scan(number:int, authorization: str = Header(None)):
-  if authorization != f'Bearer {TOKEN}':
-    raise HTTPException(
-      status_code= 402,
-      detail= "Unauthorized : Token invalide"
-    )
+@app.get("/pokemons/{number}/scan", dependencies=[Depends(verify_token)])
+def get_pokemon_by_scan(number:int):
   pokemon, error_message = get_pokemon_service(number)
   # pokemon, error_message = get_pokemon_from_api(number)
   if pokemon == None :
