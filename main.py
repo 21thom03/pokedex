@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from schemas.pokemon import Pokemon
 from db.database import create_database
 from services.pokemon_service import get_pokemon_service
@@ -6,6 +6,7 @@ from repositories.pokemon_repository import get_pokemon_by_number, get_all_pokem
 import requests, json
 
 create_database()
+TOKEN = "ENSEA2026"
 
 app = FastAPI()
 
@@ -38,7 +39,12 @@ def get_pokemon(number:int):
 
 
 @app.get("/pokemons/{number}/scan")
-def get_pokemon_by_scan(number:int):
+def get_pokemon_by_scan(number:int, authorization: str = Header(None)):
+  if authorization != f'Bearer {TOKEN}':
+    raise HTTPException(
+      status_code= 402,
+      detail= "Unauthorized : Token invalide"
+    )
   pokemon, error_message = get_pokemon_service(number)
   # pokemon, error_message = get_pokemon_from_api(number)
   if pokemon == None :
