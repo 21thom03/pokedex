@@ -69,3 +69,21 @@ def get_stats():
     "remaining" : 151-len(pokemon_discovered),
     "completion_percentage" : round(len(pokemon_discovered)/151 * 100, 2)
   }
+
+@app.get("/stats/types")
+def get_stats():
+  all_pokemon, error_message = get_all_pokemons()
+  if error_message != None :
+    raise HTTPException(
+    status_code= error_message["status_code"],
+    detail= error_message["error"]
+  )
+  types = dict()
+  for pokemon in all_pokemon:
+    for pokemon_type in pokemon.types :
+      if pokemon_type in types :
+        types[pokemon_type] += 1
+      else :
+        types[pokemon_type] = 1
+
+  return types
