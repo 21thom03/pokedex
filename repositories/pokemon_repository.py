@@ -3,6 +3,41 @@ from schemas.pokemon import Pokemon
 from schemas.type import Type
 import json
 
+def get_all_pokemons():
+  connection = get_connection()
+  cursor = connection.cursor()
+  try :
+    cursor.execute(
+      """
+        SELECT * FROM pokemon ORDER BY number
+      """
+    )
+    pokemon_json = cursor.fetchall()
+    connection.commit()
+  except Exception as e :
+    connection.rollback()
+    error_message = {
+      "status_code" : 400,
+      "error" : f"Error with database : {e}"
+    }
+  connection.close()
+  if not (len(pokemon_json) > 0):
+    return None, error_message
+  
+  all_pokemon = [] 
+  for pokemon in pokemon_json :
+    all_pokemon.append(Pokemon(
+        number=pokemon["number"],
+        name= pokemon["name"],
+        name_fr= pokemon["name_fr"],
+        types= json.loads(pokemon["types"]),
+        image_url= pokemon["image_url"],
+        height= pokemon["height"],
+        weight= pokemon["weight"],
+        evolves_from_number= pokemon["evolves_from_number"],
+      ))
+  return all_pokemon, ""
+
 def get_pokemon_by_number(number) -> Pokemon:
   connection = get_connection()
   cursor = connection.cursor()

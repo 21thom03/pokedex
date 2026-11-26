@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from schemas.pokemon import Pokemon
 from db.database import create_database
 from services.pokemon_service import get_pokemon_service
-from repositories.pokemon_repository import get_pokemon_by_number
+from repositories.pokemon_repository import get_pokemon_by_number, get_all_pokemons
 import requests, json
 
 create_database()
@@ -14,6 +14,17 @@ def get_health():
   return {
     "status" : "ok"
   }
+
+@app.get("/pokemons")
+def get_all_pokemons_from_db():
+  all_pokemons, error_message = get_all_pokemons()
+  if all_pokemons == None :
+    raise HTTPException(
+    status_code= error_message["status_code"],
+    detail= error_message["error"]
+  )
+  return all_pokemons
+
 
 @app.get("/pokemons/{number}")
 def get_pokemon(number:int):
