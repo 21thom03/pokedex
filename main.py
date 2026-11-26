@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from schemas.pokemon import Pokemon
 from db.database import create_database
 from services.pokemon_service import get_pokemon_service
+from repositories.pokemon_repository import get_pokemon_by_number
 import requests, json
 
 create_database()
@@ -16,20 +17,14 @@ def get_health():
 
 @app.get("/pokemons/{number}")
 def get_pokemon(number:int):
-  api_answer = requests.get(f"{POKEAPI_URL}/pokemon/{number}")
-  if api_answer.status_code != requests.codes.ok :
+  pokemon = get_pokemon_by_number(number)
+  if pokemon == None :
     raise HTTPException(
-      status_code=api_answer.status_code,
-      detail="Pokemon number non-existent"
+      status_code= 404,
+      detail= "Not found"
     )
-  json_answer = api_answer.json()
-  pokemon_info = {
-    "number" : json_answer["id"],
-    "name" : json_answer["name"],
-    "height" : json_answer["height"],
-    "weight" : json_answer["weight"],
-    }
-  return pokemon_info
+  return pokemon
+
 
 @app.get("/pokemons/{number}/scan")
 def get_pokemon_by_scan(number:int):
