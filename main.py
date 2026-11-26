@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from schemas.pokemon import Pokemon
 from db.database import create_database
 from core.security import verify_token
@@ -9,6 +10,12 @@ import requests, json
 create_database()
 
 app = FastAPI()
+app.add_middleware(
+CORSMiddleware,
+allow_origins=["*"],
+allow_methods=["*"],
+allow_headers=["*"],
+)
 
 @app.get("/health")
 def get_health():
