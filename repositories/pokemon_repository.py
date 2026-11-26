@@ -65,49 +65,6 @@ def get_pokemon_by_number(number) -> Pokemon:
       evolves_from_number= pokemon_json["evolves_from_number"],
     )
 
-def push_pokemon_to_db(pokemon:Pokemon) -> dict:
-  error_message = None
-  print(pokemon.types)
-  connection = get_connection()
-  cursor = connection.cursor()
-  try :
-    cursor.execute(
-      """
-        INSERT INTO pokemon
-        (
-          number,
-          name,
-          name_fr,
-          types,
-          image_url,
-          height,
-          weight,
-          evolves_from_number
-        )
-        VALUES (? ,? ,? ,? ,? ,? ,? ,?)
-      """,
-      (
-        pokemon.number,
-        pokemon.name,
-        pokemon.name_fr,
-        json.dumps(pokemon.types),
-        pokemon.image_url,
-        pokemon.height,
-        pokemon.weight,
-        pokemon.evolves_from_number
-      )
-    )
-    connection.commit()
-  except Exception as e :
-    connection.rollback()
-    error_message = {
-      "status_code" : 400,
-      "error" : f"Error with database : {e}"
-    }
-    print(f"\033[35mError: {error_message}\033[00m")
-  connection.close()
-  return error_message 
-
 def get_type_in_database(technical_type:str) -> dict:
   connection = get_connection()
   cursor = connection.cursor()
@@ -191,6 +148,49 @@ def get_highest_pokemon():
     return None, error_message
   connection.close()
   return pokemon_json, None
+
+def push_pokemon_to_db(pokemon:Pokemon) -> dict:
+  error_message = None
+  print(pokemon.types)
+  connection = get_connection()
+  cursor = connection.cursor()
+  try :
+    cursor.execute(
+      """
+        INSERT INTO pokemon
+        (
+          number,
+          name,
+          name_fr,
+          types,
+          image_url,
+          height,
+          weight,
+          evolves_from_number
+        )
+        VALUES (? ,? ,? ,? ,? ,? ,? ,?)
+      """,
+      (
+        pokemon.number,
+        pokemon.name,
+        pokemon.name_fr,
+        json.dumps(pokemon.types),
+        pokemon.image_url,
+        pokemon.height,
+        pokemon.weight,
+        pokemon.evolves_from_number
+      )
+    )
+    connection.commit()
+  except Exception as e :
+    connection.rollback()
+    error_message = {
+      "status_code" : 400,
+      "error" : f"Error with database : {e}"
+    }
+    print(f"\033[35mError: {error_message}\033[00m")
+  connection.close()
+  return error_message
 
 def push_type_in_database(pokemon_type:Type) -> dict:
   error_message = None
