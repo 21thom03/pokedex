@@ -149,9 +149,38 @@ def get_highest_pokemon():
   connection.close()
   return pokemon_json, None
 
+def get_pokemon_using_filter(    
+    filters : list[dict]):
+  sql_filter = str("WHERE ")
+  for filter in filters :
+    if filter["value"] != None:
+      if sql_filter != "WHERE ":
+        sql_filter += "and "
+      sql_filter += filter["name"] + filter["value"]
+
+  connection = get_connection()
+  cursor = connection.cursor()
+  try :
+    cursor.execute(
+      f"""
+        SELECT * FROM pokemon {sql_filter if sql_filter != "WHERE " else ""}
+      """
+    )
+    pokemon_json = cursor.fetchall()
+    connection.commit()
+  except Exception as e :
+    connection.rollback()
+    error_message = {
+      "status_code" : 400,
+      "error" : f"Error with database : {e}"
+    }
+    connection.close()
+    return None, error_message
+  connection.close()
+  return pokemon_json, None
+
 def push_pokemon_to_db(pokemon:Pokemon) -> dict:
   error_message = None
-  print(pokemon.types)
   connection = get_connection()
   cursor = connection.cursor()
   try :
